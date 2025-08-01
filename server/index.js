@@ -151,3 +151,7 @@ app.get('/api/categories', async (req, res) => {
   const categories = await Product.distinct('category');
   res.json(categories);
 });
+
+app.get('/', (req, res) => {
+  res.send('<h1>Welcome to Choice Haat API!</h1><p>Backend is running.</p>');
+});
