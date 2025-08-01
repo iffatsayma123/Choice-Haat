@@ -153,5 +153,59 @@ app.get('/api/categories', async (req, res) => {
 });
 
 app.get('/', (req, res) => {
-  res.send('<h1>Welcome to Choice Haat API!</h1><p>Backend is running.</p>');
+  res.send(`
+    <html>
+      <head>
+        <title>Choice Haat API</title>
+        <style>
+          body {
+            background: linear-gradient(135deg, #FFF8E1, #FFE082 90%);
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            margin: 0;
+          }
+          .api-box {
+            background: white;
+            padding: 32px 40px;
+            border-radius: 24px;
+            box-shadow: 0 4px 32px #ffd60055;
+            text-align: center;
+          }
+          .api-box img {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            margin-bottom: 16px;
+            border: 2px solid #FFC700;
+            background: #FFF;
+          }
+          h1 {
+            color: #FFC700;
+            font-size: 2.4rem;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+          }
+          p {
+            color: #555;
+            font-size: 1.1rem;
+          }
+          .api-link {
+            color: #1976D2;
+            text-decoration: underline;
+            margin-top: 18px;
+            display: inline-block;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="api-box">
+          <img src="/logo.jpg" alt="Choice Haat logo" />
+          <h1>Welcome to Choice Haat API!</h1>
+          <p>Your backend is running.<br>
+          <b>Visit <a href="/api/products" class="api-link">/api/products</a> to view the product list as JSON.</b></p>
+        </div>
+      </body>
+    </html>
+  `);
 });
