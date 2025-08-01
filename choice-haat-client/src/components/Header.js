@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '../assets/logo.jpg'; // update the path if you put in public
+import logo from '../assets/logo.jpg'; // update the path if needed
 
 export default function Header() {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const user = JSON.parse(localStorage.getItem('user') || 'null');
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -21,7 +21,7 @@ export default function Header() {
             src={logo}
             alt="Choice Haat"
             className="h-10 w-10 rounded-full border border-gray-300"
-            style={{ background: "#FFC700" }} // optional: yellow bg behind logo if PNG not transparent
+            style={{ background: "#FFC700" }}
           />
           <Link to="/" className="text-xl font-bold" style={{ color: '#FFC700' }}>
             Choice Haat
@@ -29,18 +29,22 @@ export default function Header() {
         </div>
         <div className="flex gap-6 items-center">
           <Link to="/products" className="nav-link">Products</Link>
+          {/* Cart only for normal user */}
           {user && user.id && !user.isAdmin && (
             <Link to="/cart" className="nav-link">Cart</Link>
           )}
+          {/* Order Tracking and My Orders for normal user */}
           {user && user.id && !user.isAdmin && (
             <>
               <Link to="/track" className="nav-link">Order Tracking</Link>
               <Link to="/my-orders" className="nav-link">My Orders</Link>
             </>
           )}
+          {/* Admin Dashboard only for admin */}
           {user && user.isAdmin && (
             <Link to="/admin" className="nav-link font-bold text-red-600">Admin Dashboard</Link>
           )}
+          {/* Right side: login/register/logout */}
           {user && user.id ? (
             <>
               <span className="ml-2 text-gray-600">Hi, {user.name}</span>
@@ -62,4 +66,3 @@ export default function Header() {
     </header>
   );
 }
-
