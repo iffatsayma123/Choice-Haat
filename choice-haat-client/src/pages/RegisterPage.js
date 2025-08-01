@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
 import api from '../api';
+import { useNavigate } from 'react-router-dom';
 
 export default function RegisterPage() {
   const [form, setForm] = useState({ name: '', email: '', password: '' });
@@ -9,16 +9,18 @@ export default function RegisterPage() {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setError('');
     try {
       await api.post('/register', form);
-      navigate('/login?registered=1');
+      alert('Registration successful!');
+      navigate('/login');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto">
+    <div className="max-w-md mx-auto mt-10">
       <h1 className="text-3xl font-semibold mb-6">Register</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -52,13 +54,15 @@ export default function RegisterPage() {
           />
         </div>
         {error && <div className="text-red-600">{error}</div>}
-        <button type="submit" className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700">
+        <button
+          type="submit"
+          className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
           Register
         </button>
       </form>
       <p className="mt-4 text-center">
-        Already have an account?{' '}
-        <Link to="/login" className="text-blue-600 underline">Login</Link>
+        Already have an account? <a href="/login" className="text-blue-600 underline">Login</a>
       </p>
     </div>
   );
