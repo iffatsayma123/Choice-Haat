@@ -6,7 +6,7 @@ export default function ProductCard({ product }) {
     <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
       <Link to={`/products/${product._id}`}>
         <img
-          src={`http://localhost:5000/uploads/${product.image}`}
+          src={`https://choice-haat-backend-npzd.onrender.com/api/uploads/${product.image}`}
           alt={product.name}
           className="w-full h-48 object-cover mb-4 rounded bg-white"
         />
