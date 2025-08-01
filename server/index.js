@@ -152,6 +152,9 @@ app.get('/api/categories', async (req, res) => {
   res.json(categories);
 });
 
+
+
+app.use(express.static('public'));
 app.get('/', (req, res) => {
   res.send(`
     <html>
