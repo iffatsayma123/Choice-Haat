@@ -7,21 +7,20 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = async e => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
     try {
       const res = await api.post('/login', form);
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
       navigate('/');
-    } catch (err) {
+    } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10">
+    <div className="max-w-md mx-auto">
       <h1 className="text-3xl font-semibold mb-6">Login</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -45,15 +44,11 @@ export default function LoginPage() {
           />
         </div>
         {error && <div className="text-red-600">{error}</div>}
-        <button
-          type="submit"
-          className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          Login
-        </button>
+        <button type="submit" className="w-full py-3 bg-blue-600 text-white rounded hover:bg-blue-700">Login</button>
       </form>
       <p className="mt-4 text-center">
-        Don't have an account? <a href="/register" className="text-blue-600 underline">Sign up</a>
+        Don't have an account?{' '}
+        <a href="/register" className="text-blue-600 underline">Sign up</a>
       </p>
     </div>
   );

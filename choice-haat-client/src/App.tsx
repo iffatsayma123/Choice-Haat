@@ -1,25 +1,29 @@
-import React from 'react'
-import { Routes, Route, Navigate } from 'react-router-dom'
+import React, { ReactNode } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
-import Header from './components/Header'
-import Footer from './components/Footer'
-import HomePage from './pages/HomePage'
-import ProductsPage from './pages/ProductsPage'
-import ProductDetailsPage from './pages/ProductDetailsPage'
-import CartPage from './pages/CartPage'
-import CheckoutPage from './pages/CheckoutPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import OrderTrackingPage from './pages/OrderTrackingPage'
-import AdminDashboard from './pages/AdminDashboard'
-import OrderConfirmationPage from './pages/OrderConfirmationPage'
-import MyOrdersPage from './pages/MyOrdersPage'
+import Header from './components/Header';
+import Footer from './components/Footer';
+import HomePage from './pages/HomePage';
+import ProductsPage from './pages/ProductsPage';
+import ProductDetailsPage from './pages/ProductDetailsPage';
+import CartPage from './pages/CartPage';
+import CheckoutPage from './pages/CheckoutPage';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
+import OrderTrackingPage from './pages/OrderTrackingPage';
+import AdminDashboard from './pages/AdminDashboard';
+import OrderConfirmationPage from './pages/OrderConfirmationPage';
+import MyOrdersPage from './pages/MyOrdersPage';
 import FAQPage from './pages/FAQPage';
 import AboutUsPage from './pages/AboutUsPage';
 
-function RequireAdmin({ children }) {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  return user && user.isAdmin ? children : <Navigate to="/login" />;
+type User = {
+  isAdmin?: boolean;
+};
+
+function RequireAdmin({ children }: { children: ReactNode }) {
+  const user: User = JSON.parse(localStorage.getItem('user') || '{}');
+  return user && user.isAdmin ? <>{children}</> : <Navigate to="/login" />;
 }
 
 export default function App() {
@@ -36,8 +40,8 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/track" element={<OrderTrackingPage />} />
-           <Route path="/faq" element={<FAQPage />} />
-           <Route path="/about" element={<AboutUsPage />} />
+          <Route path="/faq" element={<FAQPage />} />
+          <Route path="/about" element={<AboutUsPage />} />
           <Route
             path="/admin"
             element={
@@ -52,6 +56,5 @@ export default function App() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }
-

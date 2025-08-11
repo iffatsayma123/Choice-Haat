@@ -1,6 +1,18 @@
 import React from 'react';
 
-export default function CartItem({ item, onUpdate, onRemove }) {
+type CartItemProps = {
+  item: {
+    id: string;
+    name: string;
+    price: number;
+    image: string;
+    quantity: number;
+  };
+  onUpdate: (id: string, newQty: number) => void;
+  onRemove: (id: string) => void;
+};
+
+export default function CartItem({ item, onUpdate, onRemove }: CartItemProps) {
   return (
     <div className="flex items-center border-b py-4">
       <img
@@ -10,13 +22,13 @@ export default function CartItem({ item, onUpdate, onRemove }) {
       />
       <div className="flex-1">
         <h4 className="font-semibold">{item.name}</h4>
-       <p className="text-blue-600 font-bold">৳{product.price}</p>
+        <p className="text-blue-600 font-bold">৳{item.price}</p>
 
         <div className="mt-2 flex items-center">
           <input
             type="number"
             value={item.quantity}
-            min="1"
+            min={1}
             className="w-16 p-1 border rounded"
             onChange={e => onUpdate(item.id, Number(e.target.value))}
           />

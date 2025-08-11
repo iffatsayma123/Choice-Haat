@@ -1,29 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
-import ProductCard from '../components/ProductCard';
+import ProductCard, { Product } from '../components/ProductCard';
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('');
 
   useEffect(() => {
-    // Load all products
     api.get('/products').then(res => setProducts(res.data));
-    // Build unique category list from products
-    api.get('/products').then(res => {
-      const uniqueCats = Array.from(
-        new Set(
-          res.data
-            .map(p => (p.category ? p.category.trim() : ""))
-            .filter(cat => !!cat)
-        )
-      );
-      setCategories(uniqueCats);
-    });
+    api.get('/categories').then(res => setCategories(res.data as string[]));
   }, []);
 
-  // Filter products if a category is selected
   const filtered = selectedCategory
     ? products.filter(
         p =>
@@ -47,15 +35,15 @@ export default function ProductsPage() {
           ))}
         </select>
       </div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {filtered.map(product => (
           <ProductCard product={product} key={product._id} />
         ))}
       </div>
+
       {!filtered.length && (
-        <div className="text-center text-gray-500 mt-10">
-          No products found for this category.
-        </div>
+        <div className="text-center text-gray-500 mt-10">No products found for this category.</div>
       )}
     </div>
   );
