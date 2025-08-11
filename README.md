@@ -129,7 +129,7 @@ ADMIN DASHBOARD:
 <img width="1307" height="640" alt="image" src="https://github.com/user-attachments/assets/01005c38-aa90-4e5c-b347-b023890601b3" />
 
 📜 License
-This project is licensed under the **MIT License** - see the [[LICENSE](LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENCE](LICENCE) file for details.
 
 
 
