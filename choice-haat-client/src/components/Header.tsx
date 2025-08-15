@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.jpg';
 
@@ -11,12 +11,19 @@ type User = {
 export default function Header() {
   const user: User = JSON.parse(localStorage.getItem('user') || 'null');
   const navigate = useNavigate();
+  const [globalQ, setGlobalQ] = useState('');
 
   const handleLogout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
     navigate('/login');
     window.location.reload();
+  };
+
+  const goSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate(`/products?q=${encodeURIComponent(globalQ)}`);
+    setGlobalQ('');
   };
 
   return (
@@ -33,20 +40,36 @@ export default function Header() {
             Choice Haat
           </Link>
         </div>
+
+        {/* global search (optional) */}
+        <form onSubmit={goSearch} className="hidden md:flex items-center gap-2">
+          <input
+            value={globalQ}
+            onChange={e => setGlobalQ(e.target.value)}
+            placeholder="Search…"
+            className="border rounded px-2 py-1"
+          />
+          <button className="px-3 py-1 bg-blue-600 text-white rounded">Go</button>
+        </form>
+
         <div className="flex gap-6 items-center">
           <Link to="/products" className="nav-link">Products</Link>
-          {user && user.id && !user.isAdmin && (
-            <Link to="/cart" className="nav-link">Cart</Link>
-          )}
+
+          {/* Customer-only */}
           {user && user.id && !user.isAdmin && (
             <>
+              <Link to="/cart" className="nav-link">Cart</Link>
               <Link to="/track" className="nav-link">Order Tracking</Link>
               <Link to="/my-orders" className="nav-link">My Orders</Link>
             </>
           )}
+
+          {/* Admin-only */}
           {user && user.isAdmin && (
             <Link to="/admin" className="nav-link font-bold text-red-600">Admin Dashboard</Link>
           )}
+
+          {/* Auth */}
           {user && user.id ? (
             <>
               <span className="ml-2 text-gray-600">Hi, {user.name}</span>

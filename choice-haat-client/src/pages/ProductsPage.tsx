@@ -1,49 +1,93 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../api';
 import ProductCard, { Product } from '../components/ProductCard';
 
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
+
 export default function ProductsPage() {
+  const query = useQuery();
+  const navigate = useNavigate();
+
+  const initialQ = query.get('q') || '';
+  const initialCategory = query.get('category') || '';
+
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [search, setSearch] = useState<string>(initialQ);
+  const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory);
+  const [loading, setLoading] = useState(false);
 
+  // Build query string for API + URL
+  const queryString = useMemo(() => {
+    const params = new URLSearchParams();
+    if (search.trim()) params.set('q', search.trim());
+    if (selectedCategory.trim()) params.set('category', selectedCategory.trim());
+    return params.toString();
+  }, [search, selectedCategory]);
+
+  // Load categories once
   useEffect(() => {
-    api.get('/products').then(res => setProducts(res.data));
-    api.get('/categories').then(res => setCategories(res.data as string[]));
+    api.get<string[]>('/categories').then(res => setCategories(res.data));
   }, []);
 
-  const filtered = selectedCategory
-    ? products.filter(
-        p =>
-          p.category &&
-          p.category.trim().toLowerCase() === selectedCategory.trim().toLowerCase()
-      )
-    : products;
+  // Fetch products when q/category changes (debounced)
+  useEffect(() => {
+    setLoading(true);
+    const timer = setTimeout(() => {
+      const url = queryString ? `/products?${queryString}` : '/products';
+      api.get<Product[]>(url)
+        .then(res => setProducts(res.data))
+        .finally(() => setLoading(false));
+
+      // keep URL in sync
+      const nav = queryString ? `?${queryString}` : '';
+      navigate(`/products${nav}`, { replace: true });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [queryString, navigate]);
 
   return (
     <div className="container mx-auto">
-      <div className="mb-6 flex gap-4 items-center">
-        <label className="font-semibold">Filter by Category:</label>
+      {/* Filters */}
+      <div className="mb-6 grid gap-3 md:grid-cols-3">
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search products..."
+          className="border p-2 rounded w-full"
+        />
         <select
           value={selectedCategory}
           onChange={e => setSelectedCategory(e.target.value)}
-          className="border p-2 rounded"
+          className="border p-2 rounded w-full"
         >
-          <option value="">All</option>
+          <option value="">All categories</option>
           {categories.map(cat => (
             <option key={cat} value={cat}>{cat}</option>
           ))}
         </select>
+        <button
+          onClick={() => { setSearch(''); setSelectedCategory(''); }}
+          className="border p-2 rounded w-full hover:bg-gray-50"
+        >
+          Clear filters
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {filtered.map(product => (
-          <ProductCard product={product} key={product._id} />
-        ))}
-      </div>
-
-      {!filtered.length && (
-        <div className="text-center text-gray-500 mt-10">No products found for this category.</div>
+      {/* Results */}
+      {loading ? (
+        <div>Loading…</div>
+      ) : products.length === 0 ? (
+        <div className="text-center text-gray-500 mt-10">No products found.</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {products.map(product => (
+            <ProductCard product={product} key={product._id} />
+          ))}
+        </div>
       )}
     </div>
   );

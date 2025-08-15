@@ -15,7 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// static files
+// Serve static images from /uploads
 app.use('/uploads', express.static('uploads'));
 
 // --- Mongo ---
@@ -32,6 +32,9 @@ const ProductSchema = new mongoose.Schema({
   description: String,
   category: String
 });
+// helpful indexes for search & category
+ProductSchema.index({ name: 'text', description: 'text' });
+ProductSchema.index({ category: 1 });
 const Product = mongoose.model('Product', ProductSchema);
 
 const UserSchema = new mongoose.Schema({
@@ -75,7 +78,7 @@ function genOrderId() {
   return `CH-${y}${m}${day}-${rnd}`;
 }
 
-// --- Upload ---
+// --- Upload (Admin dashboard uses this) ---
 app.post('/api/upload', upload.single('file'), (req, res) => {
   const oldPath = req.file.path;
   const newPath = path.join('uploads', req.file.originalname);
@@ -84,8 +87,20 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 });
 
 // --- Products ---
+// Supports search (?q=) and category (?category=)
 app.get('/api/products', async (req, res) => {
-  const products = await Product.find();
+  const { q, category } = req.query;
+
+  const filter = {};
+  if (q && typeof q === 'string' && q.trim()) {
+    const rx = new RegExp(q.trim(), 'i');
+    filter.$or = [{ name: rx }, { description: rx }];
+  }
+  if (category && typeof category === 'string' && category.trim()) {
+    filter.category = category.trim();
+  }
+
+  const products = await Product.find(filter).sort({ _id: -1 });
   res.json(products);
 });
 
@@ -166,7 +181,7 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-// Track by human-friendly orderId (NOT Mongo _id)
+// Track by human-friendly orderId
 app.get('/api/orders/by-order-id/:orderId', async (req, res) => {
   const order = await Order.findOne({ orderId: req.params.orderId }).populate('user', 'name email');
   if (!order) return res.status(404).json({ message: 'Order not found' });
